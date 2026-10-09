@@ -3,25 +3,139 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Site</title>
-<link rel="stylesheet" href="site.css">
+<title>CMS Admin</title>
+<link rel="stylesheet" href="admin.css">
 </head>
 <body>
-<header class="site-header">
-  <div class="wrap header-inner">
-    <a class="brand" href="#/" id="brand">My Site</a>
-    <nav id="nav" aria-label="Site navigation"></nav>
+
+<!-- Setup screen: shown until a repo + token are configured -->
+<div id="setup-screen" class="screen hidden">
+  <div class="card setup-card">
+    <h1>CMS Setup</h1>
+    <p class="muted">Connect this backend to your GitHub repo. Your token is stored only in this browser.</p>
+    <label>Repo owner
+      <input id="s-owner" type="text" value="NerdyGamers" autocomplete="off" spellcheck="false">
+    </label>
+    <label>Repo name
+      <input id="s-repo" type="text" value="cms" autocomplete="off" spellcheck="false">
+    </label>
+    <label>Branch
+      <input id="s-branch" type="text" value="main" autocomplete="off" spellcheck="false">
+    </label>
+    <label>Personal access token <span class="muted">(fine-grained, Contents: read &amp; write on this repo)</span>
+      <input id="s-token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_...">
+    </label>
+    <p id="setup-error" class="error hidden"></p>
+    <button id="connect-btn" class="primary">Connect</button>
+    <p class="muted small">No token yet? GitHub &rarr; Settings &rarr; Developer settings &rarr;
+      Personal access tokens &rarr; Fine-grained tokens &rarr; Generate new token.
+      Give it <b>Contents: Read and write</b> on this repo only.</p>
   </div>
-</header>
-<main class="wrap" id="app">
-  <p class="loading">Loading&hellip;</p>
-</main>
-<footer class="wrap site-footer">
-  <span id="footer-tag"></span>
-</footer>
-<script src="lib/marked.min.js"></script>
-<script src="lib/frontmatter.js"></script>
-<script src="lib/sanitize.js"></script>
-<script src="site.js"></script>
+</div>
+
+<!-- Main admin screen -->
+<div id="app-screen" class="screen hidden">
+  <header class="admin-header">
+    <div class="wrap header-inner">
+      <span class="brand">CMS Admin</span>
+      <nav class="tabs">
+        <button data-tab="pages" class="tab active">Pages</button>
+        <button data-tab="media" class="tab">Media</button>
+        <button data-tab="settings" class="tab">Settings</button>
+      </nav>
+      <a id="view-site" href="#" target="_blank" rel="noopener" class="view-site">View site &nearr;</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <p id="status" class="status hidden"></p>
+
+    <!-- Pages tab -->
+    <section id="tab-pages">
+      <div id="pages-list">
+        <div class="toolbar">
+          <h2>Pages</h2>
+          <button id="new-page-btn" class="primary">+ New page</button>
+        </div>
+        <table class="pages-table">
+          <thead>
+            <tr><th>Title</th><th>Slug</th><th>Status</th><th>Order</th><th></th></tr>
+          </thead>
+          <tbody id="pages-tbody">
+            <tr><td colspan="5" class="muted">Loading&hellip;</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="editor" class="hidden">
+        <div class="toolbar">
+          <h2 id="editor-heading">New page</h2>
+          <button id="editor-close" class="ghost">&larr; Back to pages</button>
+        </div>
+        <div class="form-grid">
+          <label>Title
+            <input id="f-title" type="text" autocomplete="off" spellcheck="false">
+          </label>
+          <label>Slug
+            <input id="f-slug" type="text" autocomplete="off" spellcheck="false">
+          </label>
+        </div>
+        <label class="check"><input id="f-draft" type="checkbox"> Draft (hidden from the public site)</label>
+        <div class="editor-panes">
+          <div class="pane">
+            <div class="pane-label">Markdown <span class="muted small">(Ctrl+S to save)</span></div>
+            <textarea id="f-body" spellcheck="false" placeholder="Write your page in Markdown..."></textarea>
+          </div>
+          <div class="pane">
+            <div class="pane-label">Preview</div>
+            <div id="f-preview" class="preview page"></div>
+          </div>
+        </div>
+        <div class="editor-actions">
+          <button id="save-page-btn" class="primary">Save page</button>
+          <button id="delete-page-btn" class="danger hidden">Delete page</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Media tab -->
+    <section id="tab-media" class="hidden">
+      <div class="toolbar">
+        <h2>Media</h2>
+        <label class="upload-btn primary">Upload images
+          <input id="media-upload" type="file" accept="image/*" multiple class="hidden">
+        </label>
+      </div>
+      <p class="muted small">Files are committed to <code>assets/</code> in the repo. Use "Copy Markdown" to paste an image into a page.</p>
+      <div id="media-grid" class="media-grid">
+        <p class="muted">Loading&hellip;</p>
+      </div>
+    </section>
+
+    <!-- Settings tab -->
+    <section id="tab-settings" class="hidden">
+      <h2>Site settings</h2>
+      <div class="card">
+        <label>Site title
+          <input id="c-title" type="text" autocomplete="off" spellcheck="false">
+        </label>
+        <label>Tagline
+          <input id="c-tagline" type="text" autocomplete="off" spellcheck="false">
+        </label>
+        <button id="save-config-btn" class="primary">Save settings</button>
+      </div>
+      <h2>Connection</h2>
+      <div class="card">
+        <p id="conn-info" class="muted"></p>
+        <button id="disconnect-btn" class="danger">Disconnect (forget token)</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="../lib/marked.min.js"></script>
+<script src="../lib/frontmatter.js"></script>
+<script src="../lib/sanitize.js"></script>
+<script src="admin.js"></script>
 </body>
 </html>
