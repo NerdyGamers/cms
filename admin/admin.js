@@ -5,6 +5,9 @@
   'use strict';
 
   var LS_KEY = 'simplecms.settings.v1';
+  // Only these GitHub accounts may use this backend. Everyone else is
+  // turned away at the setup screen, even with a valid token.
+  var ADMIN_LOGINS = ['NerdyGamers'];
   var settings = loadSettings();
   var manifest = { pages: [] };
   var originalSlug = null; // slug of the page being edited; null = new page
@@ -174,6 +177,19 @@
           if (r.status === 404) throw new Error('Repo not found. Check owner/name, and that the token can see it.');
           if (!r.ok) throw new Error((data && data.message) || ('HTTP ' + r.status));
           return data;
+        });
+      })
+      .then(function () {
+        // Restrict the backend to the owner's GitHub account.
+        return fetch('https://api.github.com/user', { headers: headers }).then(function (r) {
+          return r.text().then(function (t) {
+            var data = t ? JSON.parse(t) : null;
+            if (!r.ok) throw new Error((data && data.message) || ('HTTP ' + r.status));
+            if (ADMIN_LOGINS.indexOf(data.login) === -1) {
+              throw new Error('This backend is restricted to the site owner. This token belongs to "' + data.login + '".');
+            }
+            return data;
+          });
         });
       })
       .then(function () {
@@ -453,7 +469,20 @@
   /* ---------------- boot ---------------- */
 
   function boot() {
-    return loadManifest().then(loadConfigForm).catch(function (e) {
+    // Re-verify the saved token's owner on every load, so a token that
+    // changes hands (or a shared browser) can't keep access.
+    return api('/user').then(function (me) {
+      if (ADMIN_LOGINS.indexOf(me.login) === -1) {
+        localStorage.removeItem(LS_KEY);
+        settings = null;
+        showSetup();
+        var errEl = $('setup-error');
+        errEl.textContent = 'This backend is restricted to the site owner (signed in as "' + me.login + '").';
+        errEl.classList.remove('hidden');
+        return;
+      }
+      return loadManifest().then(loadConfigForm);
+    }).catch(function (e) {
       if (/401/.test(e.message)) {
         status('Token was rejected (401). Please reconnect.', 'err');
         showSetup();
