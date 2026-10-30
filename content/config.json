@@ -1,1 +1,4 @@
-{"siteTitle":"My Site","tagline":"A serverless site, edited from the browser."}
+{
+  "siteTitle": "My Headless Site",
+  "tagline": "A serverless site, edited from the browser."
+}
