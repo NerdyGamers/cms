@@ -21,6 +21,15 @@ you get full version history for free.
 3. Hit **Connect**. The token is stored only in your browser's localStorage —
    it is never sent anywhere except `api.github.com`.
 
+## Access control
+
+This backend is restricted to the site owner's GitHub account (`NerdyGamers`,
+see `ADMIN_LOGINS` in `admin/admin.js`). On connect — and on every load — the
+backend checks the account behind the token and turns away anyone else, even
+with a valid token. Note the static files themselves are public (that's how
+GitHub Pages works), so a visitor can open the setup screen, but they cannot
+get into the editor or change anything.
+
 ## Using the backend
 
 - **Pages** — create, edit, reorder (↑↓), publish/draft, and delete pages.
