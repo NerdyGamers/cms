@@ -2,7 +2,7 @@
 title: Showcase
 slug: showcase
 draft: false
-updated: 2026-10-09T22:45:00Z
+updated: "2026-10-30T17:37:42.944Z"
 ---
 
 # Markdown Showcase
@@ -24,6 +24,8 @@ Everything this CMS can render, all on one page. View the source of this page in
 [GitHub](https://github.com) — [a link with a title](https://github.com "Hover text")
 
 ## Images
+
+![1793381771632-1000008814.webp](assets/1793381771632-1000008814.webp)
 
 ![A random placeholder image](https://picsum.photos/seed/cms/800/400)
 
